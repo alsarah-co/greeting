@@ -1,82 +1,114 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <title>بطاقة تهنئة</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>بطاقة تهنئة</title>
 
-  <style>
-    body{
-      margin:0;
-      font-family: Arial, "Segoe UI", system-ui;
-      background:#f7f2f3;
-    }
-    .wrap{max-width:900px;margin:24px auto;padding:12px;}
-    .card{
-      background:#fff;
-      border-radius:16px;
-      padding:16px;
-      box-shadow:0 8px 24px rgba(0,0,0,.08);
-    }
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end;}
-    label{font-weight:700}
-    input{
-      padding:12px 14px;
-      border-radius:10px;
-      border:1px solid #ddd;
-      min-width:300px;
-      font-size:15px;
-    }
-    button{
-      padding:12px 16px;
-      border-radius:10px;
-      border:0;
-      font-weight:700;
-      cursor:pointer;
-    }
-    .primary{background:#6b0f1a;color:#fff;}
-    .ghost{background:#eee;color:#6b0f1a}
-    canvas{
-      width:100%;
-      margin-top:14px;
-      border-radius:14px;
-    }
-  </style>
+<style>
+body{
+  margin:0;
+  font-family: Arial, "Segoe UI", system-ui;
+  background:#f4f4f4;
+}
+
+.wrap{
+  max-width:900px;
+  margin:30px auto;
+  padding:15px;
+}
+
+.card{
+  background:#fff;
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.row{
+  display:flex;
+  gap:10px;
+  align-items:end;
+  flex-wrap:wrap;
+}
+
+label{
+  font-weight:bold;
+  margin-bottom:6px;
+  display:block;
+}
+
+input{
+  padding:12px 14px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  min-width:320px;
+  font-size:16px;
+}
+
+button{
+  padding:12px 18px;
+  border-radius:10px;
+  border:0;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.primary{
+  background:#6b0f1a;
+  color:#fff;
+}
+
+.ghost{
+  background:#eee;
+  color:#6b0f1a;
+}
+
+canvas{
+  width:100%;
+  margin-top:20px;
+  border-radius:16px;
+}
+</style>
 </head>
 
 <body>
 <div class="wrap">
   <div class="card">
+
     <div class="row">
       <div>
         <label>اسم الموظف</label>
-        <input id="name" placeholder="اكتب الاسم" />
+        <input id="name" placeholder="اكتب الاسم هنا" />
       </div>
-      <button class="primary" id="gen">إنشاء</button>
+
+      <button class="primary" id="gen">إنشاء البطاقة</button>
       <button class="ghost" id="dl" disabled>تحميل</button>
     </div>
+
     <canvas id="c"></canvas>
+
   </div>
 </div>
 
 <script>
 const NAME_COLOR = "#7daab3";
-const BASE_FONT_SIZE = 160;
+const BASE_FONT_SIZE = 180;   // حجم كبير وواضح
 const MIN_FONT_SIZE = 60;
-const FONT_FAMILY = 'Arial, "Segoe UI"';
 
 const canvas = document.getElementById("c");
 const ctx = canvas.getContext("2d");
 const nameInput = document.getElementById("name");
+const genBtn = document.getElementById("gen");
 const dlBtn = document.getElementById("dl");
 
 let lastUrl = null;
 
-// 🔹 قياس الخط حتى يمتلئ المستطيل بدون خروج
+// تصغير تلقائي لو الاسم طويل
 function fitFont(text, maxWidth){
   let size = BASE_FONT_SIZE;
   while(size > MIN_FONT_SIZE){
-    ctx.font = `800 ${size}px ${FONT_FAMILY}`;
+    ctx.font = `800 ${size}px Arial`;
     if(ctx.measureText(text).width <= maxWidth) return size;
     size -= 2;
   }
@@ -91,16 +123,17 @@ function generate(){
   img.src = "template.png";
 
   img.onload = () => {
-    // نفس مقاس التصميم بالضبط
+
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
 
+    ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img,0,0);
 
-    // ✅ إحداثيات ثابتة (100% صح)
-    const CENTER_X = 540;     // وسط المستطيل
-    const CENTER_Y = 1360;    // داخل المستطيل
-    const MAX_WIDTH = 720;    // عرض المستطيل
+    // 🎯 مكان المستطيل الأبيض مضبوط لنفس تصميمك
+    const CENTER_X = canvas.width / 2;
+    const CENTER_Y = canvas.height * 0.75;   // وسط المستطيل
+    const MAX_WIDTH = canvas.width * 0.65;   // عرض المستطيل
 
     const fontSize = fitFont(name, MAX_WIDTH);
 
@@ -108,7 +141,7 @@ function generate(){
     ctx.textBaseline = "middle";
     ctx.direction = "rtl";
     ctx.fillStyle = NAME_COLOR;
-    ctx.font = `800 ${fontSize}px ${FONT_FAMILY}`;
+    ctx.font = `800 ${fontSize}px Arial`;
 
     ctx.shadowColor = "rgba(0,0,0,.15)";
     ctx.shadowBlur = 4;
@@ -122,13 +155,14 @@ function generate(){
 }
 
 function download(){
+  if(!lastUrl) return;
   const a = document.createElement("a");
   a.href = lastUrl;
   a.download = "بطاقة.png";
   a.click();
 }
 
-document.getElementById("gen").onclick = generate;
+genBtn.onclick = generate;
 dlBtn.onclick = download;
 </script>
 </body>
