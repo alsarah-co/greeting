@@ -6,7 +6,6 @@
   <title>بطاقة تهنئة</title>
 
   <style>
-    /* ===== الخط الجديد ===== */
     @font-face{
       font-family: "GE SS Two";
       src: url("./GE-SS-Two-Bold.otf") format("opentype");
@@ -39,10 +38,9 @@
       box-shadow:0 10px 30px rgba(0,0,0,.08);
     }
 
-    /* شعار فقط (بدون عنوان يسار) */
     .top{
       display:flex;
-      justify-content:flex-start; /* في RTL = يمين */
+      justify-content:flex-start;
       align-items:center;
       margin-bottom: 10px;
     }
@@ -59,7 +57,7 @@
       gap:10px;
       align-items:flex-end;
       flex-wrap:wrap;
-      justify-content:flex-start; /* RTL: يبدأ من اليمين */
+      justify-content:flex-start;
       margin-bottom: 10px;
     }
 
@@ -108,20 +106,16 @@
     .ghost{ background:#eee; color:var(--burgundy); }
     .ghost:disabled{ opacity:.55; cursor:not-allowed; }
 
-    /* ===== أهم جزء لمنع الـ Stretch =====
-       - نخلي العرض مناسب للعرض فقط
-       - بدون max-height يضغط الصورة
-       - التحميل يبقى FULL QUALITY لأن الكانفس داخلياً على مقاس الصورة الحقيقي */
     .preview{
-      width: 100%;
+      width:100%;
       display:flex;
       justify-content:center;
     }
 
     canvas{
       width: 100%;
-      max-width: 900px;   /* عرض مريح للمعاينة */
-      height: auto;       /* يحافظ على النسبة بدون تشويه */
+      max-width: 900px;
+      height: auto;
       display:block;
       border-radius:16px;
       background:#fff;
@@ -156,20 +150,21 @@
   </div>
 
   <script>
-    // ===== إعدادات الاسم =====
+    // ===== ألوان وحجم خط الاسم =====
     const NAME_COLOR     = "#7daab3";
-    const BASE_FONT_SIZE = 200;   // نفس اللي عندك (ما نغيره)
+    const BASE_FONT_SIZE = 200;
     const MIN_FONT_SIZE  = 70;
 
-    // ===== رجعنا نفس الإزاحة اللي قلتي كانت ممتازة =====
-    // -40 يسار (مثل ما طلبتي)
-    const OFFSET_X = -40;
-    // نزّلناه شوي عشان يكون داخل المستطيل مو فوقه
-    const OFFSET_Y = 22;
+    // ===== مكان المستطيل (بالنِّسب من أبعاد الصورة) =====
+    // إذا تبغين “تكة يسار/يمين/فوق/تحت” عدّلي OFFSETS فقط
+    const BOX_X_RATIO = 0.11;  // بداية المستطيل من اليسار
+    const BOX_W_RATIO = 0.70;  // عرض المستطيل
+    const BOX_Y_RATIO = 0.718; // بداية المستطيل من فوق
+    const BOX_H_RATIO = 0.042; // ارتفاع المستطيل
 
-    // ===== مكان الاسم كنسبة من الصورة (ثابت مهما كبر/صغر العرض) =====
-    // هذا هو اللي يحدد “مركز المستطيل”
-    const NAME_Y_RATIO = 0.748;   // مضبوط للمستطيل (إذا احتجتي: 0.746 / 0.750)
+    // ===== تكايات بسيطة (هذا اللي كنتي تبغينه “بالملي”) =====
+    const OFFSET_X = -12;  // يسار شوي (زيدي سالب = يسار أكثر)
+    const OFFSET_Y = -2;   // فوق شوي (زيدي موجب = ينزل)
 
     const canvas    = document.getElementById("c");
     const ctx       = canvas.getContext("2d");
@@ -197,24 +192,34 @@
       img.src = "template.png";
 
       img.onload = async () => {
-        // ✅ جودة وبدون ستريتش: الكانفس نفس مقاس الصورة الحقيقي
+        // ✅ جودة كاملة بدون Stretch
         canvas.width  = img.naturalWidth;
         canvas.height = img.naturalHeight;
 
         ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.drawImage(img,0,0);
 
-        // تأكد الخط جاهز قبل الرسم
+        // تأكد الخط جاهز
         await document.fonts.load('800 120px "GE SS Two"');
 
-        // مكان المستطيل
-        const x = (canvas.width / 2) + OFFSET_X;
-        const y = (canvas.height * NAME_Y_RATIO) + OFFSET_Y;
+        // حساب المستطيل الحقيقي على الكانفس
+        const boxX = canvas.width  * BOX_X_RATIO;
+        const boxY = canvas.height * BOX_Y_RATIO;
+        const boxW = canvas.width  * BOX_W_RATIO;
+        const boxH = canvas.height * BOX_H_RATIO;
 
-        // عشان الاسم ما يطلع برا المستطيل
-        const maxWidth = canvas.width * 0.55;
+        // مركز الكتابة داخل المستطيل
+        const x = (boxX + boxW/2) + OFFSET_X;
+        const y = (boxY + boxH/2) + OFFSET_Y;
 
+        // الاسم ما يطلع برا: نستخدم قصّ (clip) داخل المستطيل
+        const maxWidth = boxW * 0.92;
         const fontSize = fitFont(name, maxWidth);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(boxX, boxY, boxW, boxH);
+        ctx.clip();
 
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -222,11 +227,13 @@
         ctx.fillStyle = NAME_COLOR;
         ctx.font = `800 ${fontSize}px "GE SS Two"`;
 
+        // ظل خفيف
         ctx.shadowColor = "rgba(0,0,0,.12)";
         ctx.shadowBlur = 3;
         ctx.shadowOffsetY = 2;
 
         ctx.fillText(name, x, y);
+        ctx.restore();
 
         lastUrl = canvas.toDataURL("image/png");
         dlBtn.disabled = false;
