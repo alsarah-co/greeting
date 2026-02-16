@@ -132,12 +132,24 @@
     // إعدادات الاسم داخل "المربع"
     // =========================
     const NAME_COLOR = "#7daab3";       // ازرق فاتح
-    const BASE_FONT_SIZE = 85;          // حجم مبدئي
-    const MIN_FONT_SIZE = 22;            // أقل حجم إذا الاسم طويل
+    const BASE_FONT_SIZE = 140;          // حجم مبدئي
+    const MIN_FONT_SIZE = 40;            // أقل حجم إذا الاسم طويل
+let lastUrl = null;
 
+function fitFontSize(text, baseSize, maxWidthPx) {
+  let size = baseSize;
+  while (size > MIN_FONT_SIZE) {
+    ctx.font = `800 ${size}px Arial`;
+    if (ctx.measureText(text).width <= maxWidthPx) return size;
+    size -= 2;
+  }
+  return MIN_FONT_SIZE;
+}
+
+function generate() {
     // ✅ مكان المربع كنِسَب من الصورة (عشان يثبت مهما تغيّر المقاس)
     // إذا احتجتي ترفعينه/تنزلينه: غيّري BOX_CENTER_Y_RATIO فقط
-    const BOX_CENTER_Y_RATIO = 0.76;   // مركز المربع عموديًا (جرّبي 0.77 أو 0.80 إذا لزم)
+    const BOX_CENTER_Y_RATIO = 0.79;  // مركز المربع عموديًا (جرّبي 0.77 أو 0.80 إذا لزم)
     const MAX_TEXT_WIDTH_RATIO = 0.70;   // عرض أقصى للاسم داخل المربع (70% من عرض الصورة)
 
     // خط (اختياري) — لو تبين خط عربي مميز ارفعي ملف TTF وعدّليه هنا
@@ -179,11 +191,12 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
 
-        // حساب مكان الاسم داخل المربع
-        const x = canvas.width / 2;                         // دائمًا بالنص أفقيًا
-        const y = canvas.height * BOX_CENTER_Y_RATIO;       // مركز المربع عموديًا
+        // مركز المستطيل الأزرق تقريبًا
+const x = canvas.width / 2;
+const y = canvas.height * 0.78;   // مكان الشريط
 
-        const maxTextWidth = canvas.width * MAX_TEXT_WIDTH_RATIO;
+// عرض المستطيل الأزرق تقريبًا
+const maxTextWidth = canvas.width * 0.55;
         const size = fitFontSize(name, BASE_FONT_SIZE, maxTextWidth);
 
         // إعدادات الكتابة
@@ -225,5 +238,6 @@
   </script>
 </body>
 </html>
+
 
 
