@@ -14,8 +14,8 @@ body{
 
 .wrap{
   max-width:900px;
-  margin:16px auto;
-  padding:12px;
+  margin:30px auto;
+  padding:15px;
 }
 
 .card{
@@ -23,17 +23,6 @@ body{
   padding:20px;
   border-radius:16px;
   box-shadow:0 10px 30px rgba(0,0,0,.08);
-}
-
-.top{
-  display:flex;
-  justify-content:flex-start;
-  margin-bottom:15px;
-}
-
-.logo{
-  height:60px;
-  object-fit:contain;
 }
 
 .row{
@@ -57,6 +46,12 @@ input{
   font-size:16px;
 }
 
+small{
+  display:block;
+  margin-top:6px;
+  color:#777;
+}
+
 button{
   padding:12px 18px;
   border-radius:10px;
@@ -77,11 +72,17 @@ button{
 
 canvas{
   width:100%;
-  max-height:60vh;   /* تصغير العرض داخل الصفحة فقط */
-  height:auto;
+  max-height:70vh;   /* 👈 يصغر العرض بدون ما يخرب الجودة */
   object-fit:contain;
   margin-top:20px;
   border-radius:16px;
+}
+
+/* ===== خط GE SS ===== */
+@font-face {
+  font-family: "GE_SS";
+  src: url("GE-SS-Two-Bold.otf") format("opentype");
+  font-weight: bold;
 }
 </style>
 </head>
@@ -90,14 +91,11 @@ canvas{
 <div class="wrap">
   <div class="card">
 
-    <div class="top">
-      <img src="logo.png" class="logo" alt="Logo">
-    </div>
-
     <div class="row">
       <div>
         <label>اسم الموظف</label>
         <input id="name" placeholder="اكتب الاسم هنا" />
+        <small>يفضل استخدام الاسم الثنائي ليظهر التصميم بشكل أجمل</small>
       </div>
 
       <button class="primary" id="gen">إنشاء البطاقة</button>
@@ -111,10 +109,8 @@ canvas{
 
 <script>
 const NAME_COLOR = "#7daab3";
-
-/* ✅ لا نغيّر حجم الخط (مثل ما طلبتي) */
-const BASE_FONT_SIZE = 170;
-const MIN_FONT_SIZE  = 60;
+const BASE_FONT_SIZE = 190;   // 👈 حجم قوي وواضح
+const MIN_FONT_SIZE = 70;
 
 const canvas = document.getElementById("c");
 const ctx = canvas.getContext("2d");
@@ -127,7 +123,7 @@ let lastUrl = null;
 function fitFont(text, maxWidth){
   let size = BASE_FONT_SIZE;
   while(size > MIN_FONT_SIZE){
-    ctx.font = `800 ${size}px Arial`;
+    ctx.font = `bold ${size}px GE_SS`;
     if(ctx.measureText(text).width <= maxWidth) return size;
     size -= 2;
   }
@@ -142,43 +138,31 @@ function generate(){
   img.src = "template.png";
 
   img.onload = () => {
-    canvas.width  = img.naturalWidth;
+
+    canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
 
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img,0,0);
 
-    /* =========================
-       🎯 ضبط مكان الاسم بدقة
-       - OFFSET_X (سالب = يسار)
-       - OFFSET_Y (سالب = فوق)
-       ========================= */
-    const OFFSET_X = -15;   // ← يسار "تكة"
-    const OFFSET_Y = -10;   // ↑ فوق "تكة"
-
-    const CENTER_X = (canvas.width / 2) - 40 + OFFSET_X;
-    const CENTER_Y = (canvas.height * 0.80) + OFFSET_Y;
-
-    /* ✅ حدود المستطيل عشان الاسم ما يطلع برا */
-    const BOX_WIDTH = canvas.width * 0.68;
-    const PADDING   = canvas.width * 0.03;
-    const MAX_WIDTH = BOX_WIDTH - (PADDING * 2);
+    // 🎯 تم ضبط المكان بدقة
+    const CENTER_X = (canvas.width / 2) - 45;  // ⬅️ مزاح يسار شوي
+    const CENTER_Y = canvas.height * 0.772;    // ⬆️ مرفوع تكه
+    const MAX_WIDTH = canvas.width * 0.60;     // يمنع الخروج من المستطيل
 
     const fontSize = fitFont(name, MAX_WIDTH);
 
-    ctx.save();
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.direction = "rtl";
     ctx.fillStyle = NAME_COLOR;
-    ctx.font = `800 ${fontSize}px Arial`;
+    ctx.font = `bold ${fontSize}px GE_SS`;
 
-    ctx.shadowColor = "rgba(0,0,0,.12)";
-    ctx.shadowBlur = 3;
+    ctx.shadowColor = "rgba(0,0,0,.15)";
+    ctx.shadowBlur = 4;
     ctx.shadowOffsetY = 2;
 
     ctx.fillText(name, CENTER_X, CENTER_Y);
-    ctx.restore();
 
     lastUrl = canvas.toDataURL("image/png");
     dlBtn.disabled = false;
@@ -195,13 +179,10 @@ function download(){
 
 genBtn.onclick = generate;
 dlBtn.onclick = download;
-nameInput.addEventListener("keydown", (e) => {
-  if(e.key === "Enter") generate();
-});
 </script>
-
 </body>
 </html>
+
 
 
 
