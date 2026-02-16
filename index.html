@@ -3,91 +3,77 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>مولد بطاقة تهنئة</title>
+<title>بطاقة تهنئة</title>
 
 <style>
-@font-face{
-  font-family:"GE SS Two";
-  src:url("GE_SS_Two_Medium.otf") format("opentype");
-  font-weight:500;
-}
-
 body{
   margin:0;
-  font-family:"GE SS Two", Arial;
-  background:#f5f2f3;
+  font-family:"GE SS Two", Arial, system-ui;
+  background:#f4f4f4;
 }
 
 .wrap{
-  max-width:1000px;
-  margin:20px auto;
+  max-width:900px;
+  margin:30px auto;
   padding:15px;
 }
 
 .card{
   background:#fff;
   padding:20px;
-  border-radius:18px;
+  border-radius:16px;
   box-shadow:0 10px 30px rgba(0,0,0,.08);
-}
-
-.top{
-  display:flex;
-  justify-content:flex-end;
-  margin-bottom:15px;
-}
-
-.logo{
-  height:45px;
 }
 
 .row{
   display:flex;
-  gap:12px;
+  gap:10px;
+  align-items:end;
   flex-wrap:wrap;
-  justify-content:flex-end;
-  align-items:flex-end;
 }
 
 label{
-  display:block;
-  font-weight:600;
+  font-weight:bold;
   margin-bottom:6px;
+  display:block;
+}
+
+.note{
+  font-size:13px;
+  color:#777;
+  margin-top:6px;
 }
 
 input{
   padding:12px 14px;
-  border-radius:12px;
+  border-radius:10px;
   border:1px solid #ddd;
-  width:400px;
-  font-family:"GE SS Two";
-}
-
-.note{
-  font-size:12px;
-  margin-top:6px;
-  color:#666;
+  min-width:320px;
+  font-size:16px;
 }
 
 button{
-  padding:12px 16px;
-  border-radius:12px;
+  padding:12px 18px;
+  border-radius:10px;
   border:0;
-  font-weight:600;
+  font-weight:bold;
   cursor:pointer;
-  font-family:"GE SS Two";
 }
 
-.primary{ background:#6b0f1a; color:#fff; }
-.ghost{ background:#eee; }
+.primary{
+  background:#6b0f1a;
+  color:#fff;
+}
 
-.preview{
-  margin-top:20px;
-  display:flex;
-  justify-content:center;
+.ghost{
+  background:#eee;
+  color:#6b0f1a;
 }
 
 canvas{
+  width:100%;
+  height:auto;
+  margin-top:20px;
   border-radius:16px;
 }
 </style>
@@ -97,16 +83,12 @@ canvas{
 <div class="wrap">
   <div class="card">
 
-    <div class="top">
-      <img src="logo.png" class="logo">
-    </div>
-
     <div class="row">
       <div>
         <label>اسم الموظف</label>
-        <input id="name" placeholder="اكتب الاسم هنا">
+        <input id="name" placeholder="اكتب الاسم هنا" />
         <div class="note">
-          ملاحظة: لإظهار التصميم بشكل أجمل يُفضّل استخدام الاسم الثنائي.
+          ملاحظة: يفضل استخدام الاسم الثنائي ليظهر التصميم بشكل أجمل.
         </div>
       </div>
 
@@ -114,29 +96,15 @@ canvas{
       <button class="ghost" id="dl" disabled>تحميل</button>
     </div>
 
-    <div class="preview">
-      <canvas id="c"></canvas>
-    </div>
+    <canvas id="c"></canvas>
 
   </div>
 </div>
 
 <script>
 const NAME_COLOR = "#7daab3";
-const BASE_FONT_SIZE = 150;
-const MIN_FONT_SIZE  = 70;
-
-// 🔥 مستطيل الاسم (حسب قياس الصورة الأصلية 1152×2048)
-const RECT = {
-  x1:208/1152,
-  x2:816/1152,
-  y1:1518/2048,
-  y2:1661/2048
-};
-
-// 👇 تحكم دقيق بالمكان
-const OFFSET_X = -22;  // يسار خفيف
-const OFFSET_Y = 10;    // مركز المستطيل بالضبط
+const BASE_FONT_SIZE = 200;
+const MIN_FONT_SIZE = 70;
 
 const canvas = document.getElementById("c");
 const ctx = canvas.getContext("2d");
@@ -146,12 +114,11 @@ const dlBtn = document.getElementById("dl");
 
 let lastUrl = null;
 
-function fitFont(text, maxW, maxH){
+function fitFont(text, maxWidth){
   let size = BASE_FONT_SIZE;
-  while(size >= MIN_FONT_SIZE){
-    ctx.font = `500 ${size}px "GE SS Two"`;
-    const w = ctx.measureText(text).width;
-    if(w <= maxW && size <= maxH) return size;
+  while(size > MIN_FONT_SIZE){
+    ctx.font = `800 ${size}px "GE SS Two"`;
+    if(ctx.measureText(text).width <= maxWidth) return size;
     size -= 2;
   }
   return MIN_FONT_SIZE;
@@ -164,59 +131,48 @@ function generate(){
   const img = new Image();
   img.src = "template.png";
 
-  img.onload = ()=>{
+  img.onload = () => {
+
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
 
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img,0,0);
 
-    const rx1 = canvas.width * RECT.x1;
-    const rx2 = canvas.width * RECT.x2;
-    const ry1 = canvas.height * RECT.y1;
-    const ry2 = canvas.height * RECT.y2;
+    /* ====== قياسات المستطيل الفعلية من التصميم ====== */
+    const rx1 = canvas.width * 0.23;   // بداية المستطيل من اليسار
+    const rx2 = canvas.width * 0.77;   // نهاية المستطيل من اليمين
+    const ry1 = canvas.height * 0.78;  // أعلى المستطيل
+    const ry2 = canvas.height * 0.835; // أسفل المستطيل
 
     const rw = rx2 - rx1;
     const rh = ry2 - ry1;
 
-    const centerX = rx1 + rw/2 + OFFSET_X;
-    const centerY = ry1 + rh/2 + OFFSET_Y; // 👈 داخل المستطيل بالملي
-
+    /* ====== تعديل دقيق للنزول ====== */
     const paddingX = rw * 0.08;
-    const paddingY = rh * 0.25;
+    const paddingY = rh * 0.10;  // 🔥 تم تقليلها لينزل الاسم بالملي
 
-    const maxW = rw - paddingX*2;
-    const maxH = rh - paddingY*2;
+    const centerX = rx1 + rw/2 - 12;   // 🔥 يسار شوي
+    const centerY = ry1 + rh/2 + 12;   // 🔥 نزلناه داخل المستطيل بالضبط
 
-    const size = fitFont(name, maxW, maxH);
+    const maxWidth = rw - paddingX;
 
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(rx1+paddingX, ry1+paddingY, rw-paddingX*2, rh-paddingY*2);
-    ctx.clip();
+    const fontSize = fitFont(name, maxWidth);
 
-    ctx.textAlign="center";
-    ctx.textBaseline="middle";
-    ctx.direction="rtl";
-    ctx.fillStyle=NAME_COLOR;
-    ctx.font=`500 ${size}px "GE SS Two"`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.direction = "rtl";
+    ctx.fillStyle = NAME_COLOR;
+    ctx.font = `800 ${fontSize}px "GE SS Two"`;
+
+    ctx.shadowColor = "rgba(0,0,0,.12)";
+    ctx.shadowBlur = 3;
+    ctx.shadowOffsetY = 2;
 
     ctx.fillText(name, centerX, centerY);
 
-    ctx.restore();
-
     lastUrl = canvas.toDataURL("image/png");
-    dlBtn.disabled=false;
-
-    // عرض مناسب بدون Stretch
-    const scale = Math.min(
-      canvas.parentElement.clientWidth / canvas.width,
-      (window.innerHeight*0.75) / canvas.height,
-      1
-    );
-
-    canvas.style.width = canvas.width*scale+"px";
-    canvas.style.height = canvas.height*scale+"px";
+    dlBtn.disabled = false;
   };
 }
 
@@ -228,13 +184,8 @@ function download(){
   a.click();
 }
 
-genBtn.onclick=generate;
-dlBtn.onclick=download;
+genBtn.onclick = generate;
+dlBtn.onclick = download;
 </script>
 </body>
 </html>
-
-
-
-
-
