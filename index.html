@@ -112,9 +112,9 @@ canvas{
 <script>
 const NAME_COLOR = "#7daab3";
 
-/* ✅ ضبط أحجام أفضل للأسماء الطويلة */
-const BASE_FONT_SIZE = 170;   // كان 220 — صغرناه عشان الثلاثي يطلع مرتب
-const MIN_FONT_SIZE  = 60;    // أقل حجم مسموح
+/* ✅ لا نغيّر حجم الخط (مثل ما طلبتي) */
+const BASE_FONT_SIZE = 170;
+const MIN_FONT_SIZE  = 60;
 
 const canvas = document.getElementById("c");
 const ctx = canvas.getContext("2d");
@@ -142,23 +142,28 @@ function generate(){
   img.src = "template.png";
 
   img.onload = () => {
-    // جودة التحميل (مقاس حقيقي)
     canvas.width  = img.naturalWidth;
     canvas.height = img.naturalHeight;
 
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img,0,0);
 
-    /* 🎯 مكان المستطيل (نفس اللي عندك تقريباً) */
-    const CENTER_X = (canvas.width / 2) - 40;   // يسار شوي
-    const CENTER_Y = canvas.height * 0.80;      // نازل شوي
+    /* =========================
+       🎯 ضبط مكان الاسم بدقة
+       - OFFSET_X (سالب = يسار)
+       - OFFSET_Y (سالب = فوق)
+       ========================= */
+    const OFFSET_X = -15;   // ← يسار "تكة"
+    const OFFSET_Y = -10;   // ↑ فوق "تكة"
 
-    /* ✅ حدود المستطيل (عشان الاسم ما يطلع برا) */
-    const BOX_WIDTH = canvas.width * 0.68;      // عرض منطقة النص تقريباً
-    const PADDING   = canvas.width * 0.03;      // مسافة أمان داخل المستطيل
+    const CENTER_X = (canvas.width / 2) - 40 + OFFSET_X;
+    const CENTER_Y = (canvas.height * 0.80) + OFFSET_Y;
+
+    /* ✅ حدود المستطيل عشان الاسم ما يطلع برا */
+    const BOX_WIDTH = canvas.width * 0.68;
+    const PADDING   = canvas.width * 0.03;
     const MAX_WIDTH = BOX_WIDTH - (PADDING * 2);
 
-    // اختر الحجم المناسب حسب طول الاسم
     const fontSize = fitFont(name, MAX_WIDTH);
 
     ctx.save();
@@ -168,12 +173,10 @@ function generate(){
     ctx.fillStyle = NAME_COLOR;
     ctx.font = `800 ${fontSize}px Arial`;
 
-    // ظل خفيف
     ctx.shadowColor = "rgba(0,0,0,.12)";
     ctx.shadowBlur = 3;
     ctx.shadowOffsetY = 2;
 
-    // ✅ رسم الاسم
     ctx.fillText(name, CENTER_X, CENTER_Y);
     ctx.restore();
 
@@ -199,5 +202,6 @@ nameInput.addEventListener("keydown", (e) => {
 
 </body>
 </html>
+
 
 
