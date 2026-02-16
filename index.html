@@ -6,21 +6,16 @@
 <title>بطاقة تهنئة</title>
 
 <style>
-:root{
-  --brand:#6b0f1a;
-  --bg:#f4f4f4;
-}
-
 body{
   margin:0;
   font-family: Arial, "Segoe UI", system-ui;
-  background:var(--bg);
+  background:#f4f4f4;
 }
 
 .wrap{
   max-width:900px;
-  margin:30px auto;
-  padding:15px;
+  margin:16px auto;
+  padding:12px;
 }
 
 .card{
@@ -32,22 +27,13 @@ body{
 
 .top{
   display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:14px;
+  justify-content:flex-start;
+  margin-bottom:15px;
 }
 
 .logo{
-  height:56px;
+  height:60px;
   object-fit:contain;
-}
-
-h1{
-  margin:0;
-  font-size:18px;
-  font-weight:900;
-  color:var(--brand);
 }
 
 .row{
@@ -80,17 +66,20 @@ button{
 }
 
 .primary{
-  background:var(--brand);
+  background:#6b0f1a;
   color:#fff;
 }
 
 .ghost{
   background:#eee;
-  color:var(--brand);
+  color:#6b0f1a;
 }
 
 canvas{
   width:100%;
+  max-height:60vh;   /* 👈 تصغير العرض داخل الصفحة */
+  height:auto;
+  object-fit:contain;
   margin-top:20px;
   border-radius:16px;
 }
@@ -101,10 +90,8 @@ canvas{
 <div class="wrap">
   <div class="card">
 
-    <!-- ✅ اللوقو + عنوان -->
     <div class="top">
-      <img class="logo" src="logo.png" alt="Logo">
-      <h1>بطاقة تهنئة</h1>
+      <img src="logo.png" class="logo" alt="Logo">
     </div>
 
     <div class="row">
@@ -124,7 +111,7 @@ canvas{
 
 <script>
 const NAME_COLOR = "#7daab3";
-const BASE_FONT_SIZE = 220;   // كبير وواضح
+const BASE_FONT_SIZE = 220;   // 🔥 كبرناه شوي زيادة
 const MIN_FONT_SIZE = 70;
 
 const canvas = document.getElementById("c");
@@ -153,16 +140,17 @@ function generate(){
   img.src = "template.png";
 
   img.onload = () => {
+
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
 
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img,0,0);
 
-    // ✅ تحريك الاسم يسار "تكة" إضافية
-    const CENTER_X = (canvas.width / 2) - 70;  // كان -45 → صار -70
-    const CENTER_Y = canvas.height * 0.80;
-    const MAX_WIDTH = canvas.width * 0.65;
+    /* 🎯 ضبط مكان الاسم بالضبط */
+    const CENTER_X = (canvas.width / 2) - 40;   // ⬅️ راح يسار أكثر شوي
+    const CENTER_Y = canvas.height * 0.80;      // ⬇️ نزلناه تكه إضافية
+    const MAX_WIDTH = canvas.width * 0.68;
 
     const fontSize = fitFont(name, MAX_WIDTH);
 
@@ -193,11 +181,7 @@ function download(){
 
 genBtn.onclick = generate;
 dlBtn.onclick = download;
-nameInput.addEventListener("keydown", (e) => {
-  if(e.key === "Enter") generate();
-});
 </script>
+
 </body>
 </html>
-
-
