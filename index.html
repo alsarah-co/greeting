@@ -139,23 +139,18 @@ function generate(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img,0,0);
 
-    /* ====== قياسات المستطيل الفعلية من التصميم ====== */
-    const rx1 = canvas.width * 0.23;   // بداية المستطيل من اليسار
-    const rx2 = canvas.width * 0.77;   // نهاية المستطيل من اليمين
-    const ry1 = canvas.height * 0.78;  // أعلى المستطيل
-    const ry2 = canvas.height * 0.835; // أسفل المستطيل
+    /* 🔥 إحداثيات دقيقة للمستطيل */
+    const rectWidth  = canvas.width * 0.54;
+    const rectHeight = canvas.height * 0.05;
 
-    const rw = rx2 - rx1;
-    const rh = ry2 - ry1;
+    const rectX = (canvas.width - rectWidth) / 2;
+    const rectY = canvas.height * 0.802;   // مكان المستطيل بالضبط
 
-    /* ====== تعديل دقيق للنزول ====== */
-    const paddingX = rw * 0.08;
-    const paddingY = rh * 0.10;  // 🔥 تم تقليلها لينزل الاسم بالملي
+    /* 🔥 تعديل بالملي */
+    const centerX = rectX + rectWidth / 2 - 18; // يسار شوي
+    const centerY = rectY + rectHeight / 2 - 6; // ارفع فوق شوي
 
-    const centerX = rx1 + rw/2 - 12;   // 🔥 يسار شوي
-    const centerY = ry1 + rh/2 + 12;   // 🔥 نزلناه داخل المستطيل بالضبط
-
-    const maxWidth = rw - paddingX;
+    const maxWidth = rectWidth * 0.9;
 
     const fontSize = fitFont(name, maxWidth);
 
