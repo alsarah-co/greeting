@@ -38,10 +38,7 @@
       margin-bottom: 14px;
     }
 
-    .logo{
-      height:52px;
-      object-fit:contain;
-    }
+    .logo{ height:52px; object-fit:contain; }
 
     h1{
       margin:0;
@@ -128,20 +125,27 @@
   </div>
 
   <script>
-    // ====== إعدادات الاسم ======
+    // ====== إعدادات الاسم (عدلي هنا فقط) ======
     const NAME_COLOR = "#7daab3";
-    const BASE_FONT_SIZE = 140;
-    const MIN_FONT_SIZE = 40;
 
-    // مكان الاسم داخل المستطيل (عدلي هذا فقط إذا احتجتي)
-    const Y_RATIO = 0.78;           // ارفعيه = قللي (مثلاً 0.775) / نزليه = كبّري (مثلاً 0.785)
-    const MAX_WIDTH_RATIO = 0.55;   // عرض الاسم داخل المستطيل
+    // أكبر حجم (بيحاول يعبي المستطيل وبعدين يصغّر لو الاسم طويل)
+    const BASE_FONT_SIZE = 170;
+    const MIN_FONT_SIZE  = 55;
+
+    // ✅ إحداثيات الاسم كنِسَب من طول/عرض الصورة
+    // هذا اللي يضبط "داخل المستطيل" (نزّلناه شوي)
+    const Y_RATIO = 0.825;       // داخل المستطيل (نزلي/ارفعّي بتغيير بسيط)
+    const X_OFFSET = -35;        // يسار شوي (سالب = يسار / موجب = يمين)
+
+    // عرض الاسم داخل المستطيل (خليناه أعرض عشان يعبي)
+    const MAX_WIDTH_RATIO = 0.68;
 
     const FONT_FAMILY = 'Arial, "Segoe UI", system-ui';
 
     // ====== عناصر الصفحة ======
     const canvas = document.getElementById("c");
     const ctx = canvas.getContext("2d");
+
     const nameInput = document.getElementById("name");
     const genBtn = document.getElementById("gen");
     const dlBtn = document.getElementById("dl");
@@ -166,18 +170,18 @@
       img.src = "template.png";
 
       img.onload = () => {
-        // منع الـ Stretch: نخلي الكانفس نفس مقاس القالب
+        // منع الـ Stretch
         canvas.width  = img.naturalWidth;
         canvas.height = img.naturalHeight;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
 
-        // مكان الاسم داخل المستطيل
-        const x = canvas.width / 2;
+        // الإحداثيات داخل المستطيل
+        const x = (canvas.width / 2) + X_OFFSET;
         const y = canvas.height * Y_RATIO;
-        const maxTextWidth = canvas.width * MAX_WIDTH_RATIO;
 
+        const maxTextWidth = canvas.width * MAX_WIDTH_RATIO;
         const size = fitFontSize(name, BASE_FONT_SIZE, maxTextWidth);
 
         ctx.direction = "rtl";
@@ -186,9 +190,9 @@
         ctx.fillStyle = NAME_COLOR;
         ctx.font = `800 ${size}px ${FONT_FAMILY}`;
 
-        // ظل خفيف (اختياري)
-        ctx.shadowColor = "rgba(0,0,0,0.25)";
-        ctx.shadowBlur = 6;
+        // ظل خفيف جداً (اختياري)
+        ctx.shadowColor = "rgba(0,0,0,0.18)";
+        ctx.shadowBlur = 4;
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 2;
 
@@ -218,7 +222,3 @@
   </script>
 </body>
 </html>
-
-
-
-
