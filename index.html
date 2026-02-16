@@ -6,84 +6,69 @@
 <title>بطاقة تهنئة</title>
 
 <style>
-body{
-  margin:0;
-  font-family: Arial, "Segoe UI", system-ui;
-  background:#f4f4f4;
-}
+  body{
+    margin:0;
+    font-family: Arial, "Segoe UI", system-ui;
+    background:#f4f4f4;
+  }
 
-.wrap{
-  max-width:900px;
-  margin:30px auto;
-  padding:15px;
-}
+  .wrap{ max-width:900px; margin:30px auto; padding:15px; }
 
-.card{
-  background:#fff;
-  padding:20px;
-  border-radius:16px;
-  box-shadow:0 10px 30px rgba(0,0,0,.08);
-}
+  .card{
+    background:#fff;
+    padding:20px;
+    border-radius:16px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+  }
 
-.row{
-  display:flex;
-  gap:10px;
-  align-items:end;
-  flex-wrap:wrap;
-}
+  .row{
+    display:flex;
+    gap:10px;
+    align-items:end;
+    flex-wrap:wrap;
+  }
 
-label{
-  font-weight:bold;
-  margin-bottom:6px;
-  display:block;
-}
+  label{ font-weight:bold; margin-bottom:6px; display:block; }
 
-input{
-  padding:12px 14px;
-  border-radius:10px;
-  border:1px solid #ddd;
-  min-width:320px;
-  font-size:16px;
-}
+  input{
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid #ddd;
+    min-width:320px;
+    font-size:16px;
+  }
 
-small{
-  display:block;
-  margin-top:6px;
-  color:#777;
-}
+  small{
+    display:block;
+    margin-top:6px;
+    color:#777;
+  }
 
-button{
-  padding:12px 18px;
-  border-radius:10px;
-  border:0;
-  font-weight:bold;
-  cursor:pointer;
-}
+  button{
+    padding:12px 18px;
+    border-radius:10px;
+    border:0;
+    font-weight:bold;
+    cursor:pointer;
+  }
 
-.primary{
-  background:#6b0f1a;
-  color:#fff;
-}
+  .primary{ background:#6b0f1a; color:#fff; }
+  .ghost{ background:#eee; color:#6b0f1a; }
 
-.ghost{
-  background:#eee;
-  color:#6b0f1a;
-}
+  canvas{
+    width:100%;
+    max-height:70vh;       /* تصغير العرض فقط */
+    object-fit:contain;    /* بدون stretch */
+    margin-top:20px;
+    border-radius:16px;
+  }
 
-canvas{
-  width:100%;
-  max-height:70vh;   /* 👈 يصغر العرض بدون ما يخرب الجودة */
-  object-fit:contain;
-  margin-top:20px;
-  border-radius:16px;
-}
-
-/* ===== خط GE SS ===== */
-@font-face {
-  font-family: "GE_SS";
-  src: url("GE-SS-Two-Bold.otf") format("opentype");
-  font-weight: bold;
-}
+  /* خط GE SS */
+  @font-face{
+    font-family:"GE_SS";
+    src:url("GE-SS-Two-Bold.otf") format("opentype");
+    font-weight:bold;
+  }
 </style>
 </head>
 
@@ -108,81 +93,108 @@ canvas{
 </div>
 
 <script>
-const NAME_COLOR = "#7daab3";
-const BASE_FONT_SIZE = 190;   // 👈 حجم قوي وواضح
-const MIN_FONT_SIZE = 70;
+  const NAME_COLOR = "#7daab3";
 
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");
-const nameInput = document.getElementById("name");
-const genBtn = document.getElementById("gen");
-const dlBtn = document.getElementById("dl");
+  // (لا نغير حجم الخط زي ما طلبتي)
+  const BASE_FONT_SIZE = 190;
+  const MIN_FONT_SIZE  = 70;
 
-let lastUrl = null;
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d");
+  const nameInput = document.getElementById("name");
+  const genBtn = document.getElementById("gen");
+  const dlBtn = document.getElementById("dl");
 
-function fitFont(text, maxWidth){
-  let size = BASE_FONT_SIZE;
-  while(size > MIN_FONT_SIZE){
-    ctx.font = `bold ${size}px GE_SS`;
-    if(ctx.measureText(text).width <= maxWidth) return size;
-    size -= 2;
+  let lastUrl = null;
+
+  function fitFont(text, maxWidth){
+    let size = BASE_FONT_SIZE;
+    while(size > MIN_FONT_SIZE){
+      ctx.font = `bold ${size}px GE_SS`;
+      if(ctx.measureText(text).width <= maxWidth) return size;
+      size -= 2;
+    }
+    return MIN_FONT_SIZE;
   }
-  return MIN_FONT_SIZE;
-}
 
-function generate(){
-  const name = nameInput.value.trim();
-  if(!name) return alert("اكتب الاسم");
+  function generate(){
+    const name = nameInput.value.trim();
+    if(!name) return alert("اكتب الاسم");
 
-  const img = new Image();
-  img.src = "template.png";
+    const img = new Image();
+    img.src = "template.png";
 
-  img.onload = () => {
+    img.onload = () => {
+      canvas.width  = img.naturalWidth;
+      canvas.height = img.naturalHeight;
 
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(img,0,0);
 
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.drawImage(img,0,0);
+      /* ============================
+         ✅ مستطيل الاسم (بالنِسَب)
+         عدلنا X يسار شوي زي ما طلبتي
+         ============================ */
 
-    // 🎯 تم ضبط المكان بدقة
-    const CENTER_X = (canvas.width / 2) - 45;  // ⬅️ مزاح يسار شوي
-    const CENTER_Y = canvas.height * 0.772;    // ⬆️ مرفوع تكه
-    const MAX_WIDTH = canvas.width * 0.60;     // يمنع الخروج من المستطيل
+      const BOX_W = canvas.width  * 0.66;     // عرض المستطيل
+      const BOX_H = canvas.height * 0.048;    // ارتفاع المستطيل
 
-    const fontSize = fitFont(name, MAX_WIDTH);
+      // مركز المستطيل تقريباً (الـ Y ثابت قريب من الصورة)
+      const BOX_CENTER_Y = canvas.height * 0.747;
 
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.direction = "rtl";
-    ctx.fillStyle = NAME_COLOR;
-    ctx.font = `bold ${fontSize}px GE_SS`;
+      // 👈 هنا التعديل المهم: خليه "يسار" أكثر
+      // كان تقريباً منتصف الشاشة، الحين وديناه يسار زيادة
+      const BOX_CENTER_X = (canvas.width * 0.50) - (canvas.width * 0.035);
 
-    ctx.shadowColor = "rgba(0,0,0,.15)";
-    ctx.shadowBlur = 4;
-    ctx.shadowOffsetY = 2;
+      const BOX_X = BOX_CENTER_X - (BOX_W/2);
+      const BOX_Y = BOX_CENTER_Y - (BOX_H/2);
 
-    ctx.fillText(name, CENTER_X, CENTER_Y);
+      // نخلي النص داخل المستطيل بهامش
+      const MAX_TEXT_WIDTH = BOX_W * 0.88;
 
-    lastUrl = canvas.toDataURL("image/png");
-    dlBtn.disabled = false;
-  };
-}
+      const fontSize = fitFont(name, MAX_TEXT_WIDTH);
 
-function download(){
-  if(!lastUrl) return;
-  const a = document.createElement("a");
-  a.href = lastUrl;
-  a.download = "بطاقة.png";
-  a.click();
-}
+      // ✅ قص داخل المستطيل: مستحيل يطلع برا
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(BOX_X, BOX_Y, BOX_W, BOX_H);
+      ctx.clip();
 
-genBtn.onclick = generate;
-dlBtn.onclick = download;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.direction = "rtl";
+      ctx.fillStyle = NAME_COLOR;
+      ctx.font = `bold ${fontSize}px GE_SS`;
+
+      ctx.shadowColor = "rgba(0,0,0,.15)";
+      ctx.shadowBlur = 4;
+      ctx.shadowOffsetY = 2;
+
+      // ارسم الاسم داخل المستطيل بالضبط
+      ctx.fillText(name, BOX_CENTER_X, BOX_CENTER_Y);
+
+      ctx.restore();
+
+      lastUrl = canvas.toDataURL("image/png");
+      dlBtn.disabled = false;
+    };
+
+    img.onerror = () => alert("تأكدي أن template.png موجود بنفس الاسم داخل المستودع.");
+  }
+
+  function download(){
+    if(!lastUrl) return;
+    const a = document.createElement("a");
+    a.href = lastUrl;
+    a.download = "بطاقة.png";
+    a.click();
+  }
+
+  genBtn.onclick = generate;
+  dlBtn.onclick = download;
 </script>
 </body>
 </html>
-
 
 
 
