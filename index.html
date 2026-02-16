@@ -93,7 +93,7 @@ canvas{
 
 <script>
 const NAME_COLOR = "#7daab3";
-const BASE_FONT_SIZE = 200;   // 🔥 كبرنا الخط أكثر
+const BASE_FONT_SIZE = 220;   // 🔥 أكبر شوي
 const MIN_FONT_SIZE = 70;
 
 const canvas = document.getElementById("c");
@@ -129,10 +129,10 @@ function generate(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img,0,0);
 
-    // 🎯 تعديل المكان
-    const CENTER_X = (canvas.width / 2) - 25;   // ⬅️ راح يسار شوي
-    const CENTER_Y = canvas.height * 0.78;      // ⬇️ نزلناه شوي
-    const MAX_WIDTH = canvas.width * 0.65;
+    // 🎯 مكان الاسم مضبوط حسب صورتك
+    const CENTER_X = (canvas.width / 2) - 45;   // ⬅️ يسار تكه
+    const CENTER_Y = canvas.height * 0.80;      // ⬇️ نازل شوي
+    const MAX_WIDTH = canvas.width * 0.65;      // عرض مناسب داخل الشريط
 
     const fontSize = fitFont(name, MAX_WIDTH);
 
@@ -166,4 +166,3 @@ dlBtn.onclick = download;
 </script>
 </body>
 </html>
-
