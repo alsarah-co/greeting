@@ -6,10 +6,15 @@
 <title>بطاقة تهنئة</title>
 
 <style>
+:root{
+  --brand:#6b0f1a;
+  --bg:#f4f4f4;
+}
+
 body{
   margin:0;
   font-family: Arial, "Segoe UI", system-ui;
-  background:#f4f4f4;
+  background:var(--bg);
 }
 
 .wrap{
@@ -23,6 +28,26 @@ body{
   padding:20px;
   border-radius:16px;
   box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.logo{
+  height:56px;
+  object-fit:contain;
+}
+
+h1{
+  margin:0;
+  font-size:18px;
+  font-weight:900;
+  color:var(--brand);
 }
 
 .row{
@@ -55,13 +80,13 @@ button{
 }
 
 .primary{
-  background:#6b0f1a;
+  background:var(--brand);
   color:#fff;
 }
 
 .ghost{
   background:#eee;
-  color:#6b0f1a;
+  color:var(--brand);
 }
 
 canvas{
@@ -75,6 +100,12 @@ canvas{
 <body>
 <div class="wrap">
   <div class="card">
+
+    <!-- ✅ اللوقو + عنوان -->
+    <div class="top">
+      <img class="logo" src="logo.png" alt="Logo">
+      <h1>بطاقة تهنئة</h1>
+    </div>
 
     <div class="row">
       <div>
@@ -93,7 +124,7 @@ canvas{
 
 <script>
 const NAME_COLOR = "#7daab3";
-const BASE_FONT_SIZE = 220;   // 🔥 أكبر شوي
+const BASE_FONT_SIZE = 220;   // كبير وواضح
 const MIN_FONT_SIZE = 70;
 
 const canvas = document.getElementById("c");
@@ -122,17 +153,16 @@ function generate(){
   img.src = "template.png";
 
   img.onload = () => {
-
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
 
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img,0,0);
 
-    // 🎯 مكان الاسم مضبوط حسب صورتك
-    const CENTER_X = (canvas.width / 2) - 45;   // ⬅️ يسار تكه
-    const CENTER_Y = canvas.height * 0.80;      // ⬇️ نازل شوي
-    const MAX_WIDTH = canvas.width * 0.65;      // عرض مناسب داخل الشريط
+    // ✅ تحريك الاسم يسار "تكة" إضافية
+    const CENTER_X = (canvas.width / 2) - 70;  // كان -45 → صار -70
+    const CENTER_Y = canvas.height * 0.80;
+    const MAX_WIDTH = canvas.width * 0.65;
 
     const fontSize = fitFont(name, MAX_WIDTH);
 
@@ -163,6 +193,11 @@ function download(){
 
 genBtn.onclick = generate;
 dlBtn.onclick = download;
+nameInput.addEventListener("keydown", (e) => {
+  if(e.key === "Enter") generate();
+});
 </script>
 </body>
 </html>
+
+
