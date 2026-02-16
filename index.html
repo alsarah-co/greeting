@@ -128,37 +128,20 @@
   </div>
 
   <script>
-    // =========================
-    // إعدادات الاسم داخل "المربع"
-    // =========================
-    const NAME_COLOR = "#7daab3";       // ازرق فاتح
-    const BASE_FONT_SIZE = 140;          // حجم مبدئي
-    const MIN_FONT_SIZE = 40;            // أقل حجم إذا الاسم طويل
-let lastUrl = null;
+    // ====== إعدادات الاسم ======
+    const NAME_COLOR = "#7daab3";
+    const BASE_FONT_SIZE = 140;
+    const MIN_FONT_SIZE = 40;
 
-function fitFontSize(text, baseSize, maxWidthPx) {
-  let size = baseSize;
-  while (size > MIN_FONT_SIZE) {
-    ctx.font = `800 ${size}px Arial`;
-    if (ctx.measureText(text).width <= maxWidthPx) return size;
-    size -= 2;
-  }
-  return MIN_FONT_SIZE;
-}
+    // مكان الاسم داخل المستطيل (عدلي هذا فقط إذا احتجتي)
+    const Y_RATIO = 0.78;           // ارفعيه = قللي (مثلاً 0.775) / نزليه = كبّري (مثلاً 0.785)
+    const MAX_WIDTH_RATIO = 0.55;   // عرض الاسم داخل المستطيل
 
-function generate() {
-    // ✅ مكان المربع كنِسَب من الصورة (عشان يثبت مهما تغيّر المقاس)
-    // إذا احتجتي ترفعينه/تنزلينه: غيّري BOX_CENTER_Y_RATIO فقط
-    const BOX_CENTER_Y_RATIO = 0.79;  // مركز المربع عموديًا (جرّبي 0.77 أو 0.80 إذا لزم)
-    const MAX_TEXT_WIDTH_RATIO = 0.70;   // عرض أقصى للاسم داخل المربع (70% من عرض الصورة)
-
-    // خط (اختياري) — لو تبين خط عربي مميز ارفعي ملف TTF وعدّليه هنا
     const FONT_FAMILY = 'Arial, "Segoe UI", system-ui';
 
-    // =========================
+    // ====== عناصر الصفحة ======
     const canvas = document.getElementById("c");
     const ctx = canvas.getContext("2d");
-
     const nameInput = document.getElementById("name");
     const genBtn = document.getElementById("gen");
     const dlBtn = document.getElementById("dl");
@@ -168,7 +151,7 @@ function generate() {
     function fitFontSize(text, baseSize, maxWidthPx) {
       let size = baseSize;
       while (size > MIN_FONT_SIZE) {
-        ctx.font = `700 ${size}px ${FONT_FAMILY}`;
+        ctx.font = `800 ${size}px ${FONT_FAMILY}`;
         if (ctx.measureText(text).width <= maxWidthPx) return size;
         size -= 2;
       }
@@ -183,30 +166,27 @@ function generate() {
       img.src = "template.png";
 
       img.onload = () => {
-        // ✅ يمنع الـ Stretch: نخلي الكانفس نفس مقاس القالب الحقيقي
+        // منع الـ Stretch: نخلي الكانفس نفس مقاس القالب
         canvas.width  = img.naturalWidth;
         canvas.height = img.naturalHeight;
 
-        // ارسم القالب
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
 
-        // مركز المستطيل الأزرق تقريبًا
-const x = canvas.width / 2;
-const y = canvas.height * 0.78;   // مكان الشريط
+        // مكان الاسم داخل المستطيل
+        const x = canvas.width / 2;
+        const y = canvas.height * Y_RATIO;
+        const maxTextWidth = canvas.width * MAX_WIDTH_RATIO;
 
-// عرض المستطيل الأزرق تقريبًا
-const maxTextWidth = canvas.width * 0.55;
         const size = fitFontSize(name, BASE_FONT_SIZE, maxTextWidth);
 
-        // إعدادات الكتابة
         ctx.direction = "rtl";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = NAME_COLOR;
-        ctx.font = `700 ${size}px ${FONT_FAMILY}`;
+        ctx.font = `800 ${size}px ${FONT_FAMILY}`;
 
-        // ظل خفيف يساعد يبان فوق الخلفية (ممكن تلغينه لو تبين أبيض صافي)
+        // ظل خفيف (اختياري)
         ctx.shadowColor = "rgba(0,0,0,0.25)";
         ctx.shadowBlur = 6;
         ctx.shadowOffsetX = 0;
@@ -238,6 +218,7 @@ const maxTextWidth = canvas.width * 0.55;
   </script>
 </body>
 </html>
+
 
 
 
