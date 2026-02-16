@@ -93,8 +93,8 @@ canvas{
 
 <script>
 const NAME_COLOR = "#7daab3";
-const BASE_FONT_SIZE = 180;   // حجم كبير وواضح
-const MIN_FONT_SIZE = 60;
+const BASE_FONT_SIZE = 200;   // 🔥 كبرنا الخط أكثر
+const MIN_FONT_SIZE = 70;
 
 const canvas = document.getElementById("c");
 const ctx = canvas.getContext("2d");
@@ -104,7 +104,6 @@ const dlBtn = document.getElementById("dl");
 
 let lastUrl = null;
 
-// تصغير تلقائي لو الاسم طويل
 function fitFont(text, maxWidth){
   let size = BASE_FONT_SIZE;
   while(size > MIN_FONT_SIZE){
@@ -130,10 +129,10 @@ function generate(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img,0,0);
 
-    // 🎯 مكان المستطيل الأبيض مضبوط لنفس تصميمك
-    const CENTER_X = canvas.width / 2;
-    const CENTER_Y = canvas.height * 0.75;   // وسط المستطيل
-    const MAX_WIDTH = canvas.width * 0.65;   // عرض المستطيل
+    // 🎯 تعديل المكان
+    const CENTER_X = (canvas.width / 2) - 25;   // ⬅️ راح يسار شوي
+    const CENTER_Y = canvas.height * 0.78;      // ⬇️ نزلناه شوي
+    const MAX_WIDTH = canvas.width * 0.65;
 
     const fontSize = fitFont(name, MAX_WIDTH);
 
