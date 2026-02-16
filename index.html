@@ -6,6 +6,7 @@
   <title>بطاقة تهنئة</title>
 
   <style>
+    /* ===== الخط الجديد ===== */
     @font-face{
       font-family: "GE SS Two";
       src: url("./GE-SS-Two-Bold.otf") format("opentype");
@@ -17,14 +18,12 @@
       --burgundy:#6b0f1a;
       --bg:#f4f4f4;
       --border:#eadfe1;
-      --text:#1f1f1f;
     }
 
     body{
       margin:0;
-      font-family:"GE SS Two", Arial, sans-serif;
+      font-family:"GE SS Two", Arial, "Segoe UI", system-ui;
       background: var(--bg);
-      color: var(--text);
     }
 
     .wrap{
@@ -35,17 +34,17 @@
 
     .card{
       background:#fff;
-      padding:18px 18px 22px;
+      padding:18px;
       border-radius:18px;
       box-shadow:0 10px 30px rgba(0,0,0,.08);
     }
 
+    /* شعار فقط (بدون عنوان يسار) */
     .top{
       display:flex;
+      justify-content:flex-start; /* في RTL = يمين */
       align-items:center;
-      justify-content:flex-start;
-      gap:10px;
-      margin-bottom:12px;
+      margin-bottom: 10px;
     }
 
     .logo{
@@ -60,6 +59,7 @@
       gap:10px;
       align-items:flex-end;
       flex-wrap:wrap;
+      justify-content:flex-start; /* RTL: يبدأ من اليمين */
       margin-bottom: 10px;
     }
 
@@ -108,13 +108,21 @@
     .ghost{ background:#eee; color:var(--burgundy); }
     .ghost:disabled{ opacity:.55; cursor:not-allowed; }
 
-    /* عرض نظيف بدون stretch */
+    /* ===== أهم جزء لمنع الـ Stretch =====
+       - نخلي العرض مناسب للعرض فقط
+       - بدون max-height يضغط الصورة
+       - التحميل يبقى FULL QUALITY لأن الكانفس داخلياً على مقاس الصورة الحقيقي */
+    .preview{
+      width: 100%;
+      display:flex;
+      justify-content:center;
+    }
+
     canvas{
-      width:100%;
-      max-height: 70vh;        /* عشان ما تضطرين تسكرولين كثير */
-      height:auto;
+      width: 100%;
+      max-width: 900px;   /* عرض مريح للمعاينة */
+      height: auto;       /* يحافظ على النسبة بدون تشويه */
       display:block;
-      margin-top:12px;
       border-radius:16px;
       background:#fff;
     }
@@ -140,27 +148,34 @@
         <button class="ghost" id="dl" disabled>تحميل</button>
       </div>
 
-      <canvas id="c"></canvas>
+      <div class="preview">
+        <canvas id="c"></canvas>
+      </div>
 
     </div>
   </div>
 
   <script>
-    // ====== إعدادات الاسم ======
+    // ===== إعدادات الاسم =====
     const NAME_COLOR     = "#7daab3";
-    const BASE_FONT_SIZE = 200;  // لا تغيّرينه (مثل ما قلتي ممتاز)
+    const BASE_FONT_SIZE = 200;   // نفس اللي عندك (ما نغيره)
     const MIN_FONT_SIZE  = 70;
 
-    // ====== إحداثيات الاسم على القالب (بكسل) ======
-    // (عدّلي هذي فقط إذا تبين تحريك بالملي)
-    const OFFSET_X = -6;   // يسار "حركتين" = زودي سالب أكثر
-    const OFFSET_Y = -4;   // فوق "مرة" = خليها سالب أكثر
+    // ===== رجعنا نفس الإزاحة اللي قلتي كانت ممتازة =====
+    // -40 يسار (مثل ما طلبتي)
+    const OFFSET_X = -40;
+    // نزّلناه شوي عشان يكون داخل المستطيل مو فوقه
+    const OFFSET_Y = 22;
 
-    const canvas   = document.getElementById("c");
-    const ctx      = canvas.getContext("2d");
-    const nameInput= document.getElementById("name");
-    const genBtn   = document.getElementById("gen");
-    const dlBtn    = document.getElementById("dl");
+    // ===== مكان الاسم كنسبة من الصورة (ثابت مهما كبر/صغر العرض) =====
+    // هذا هو اللي يحدد “مركز المستطيل”
+    const NAME_Y_RATIO = 0.748;   // مضبوط للمستطيل (إذا احتجتي: 0.746 / 0.750)
+
+    const canvas    = document.getElementById("c");
+    const ctx       = canvas.getContext("2d");
+    const nameInput = document.getElementById("name");
+    const genBtn    = document.getElementById("gen");
+    const dlBtn     = document.getElementById("dl");
 
     let lastUrl = null;
 
@@ -182,25 +197,24 @@
       img.src = "template.png";
 
       img.onload = async () => {
-        // يمنع السترتش: الكانفس نفس مقاس الصورة الحقيقي
+        // ✅ جودة وبدون ستريتش: الكانفس نفس مقاس الصورة الحقيقي
         canvas.width  = img.naturalWidth;
         canvas.height = img.naturalHeight;
 
         ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.drawImage(img,0,0);
 
-        // نتأكد الخط اتحمّل قبل الرسم
-        await document.fonts.load('800 100px "GE SS Two"');
+        // تأكد الخط جاهز قبل الرسم
+        await document.fonts.load('800 120px "GE SS Two"');
 
-        // ===== مكان المستطيل =====
-        // (نسبة ثابتة + إزاحة بسيطة بالبكسل)
-        const CENTER_X = (canvas.width / 2) - 50 + OFFSET_X;  // يسار شوي
-        const CENTER_Y = (canvas.height * 0.735) + OFFSET_Y;  // فوق شوي
+        // مكان المستطيل
+        const x = (canvas.width / 2) + OFFSET_X;
+        const y = (canvas.height * NAME_Y_RATIO) + OFFSET_Y;
 
-        // عرض الاسم داخل حدود المستطيل (عشان ما يطلع برا)
-        const MAX_WIDTH = canvas.width * 0.55;
+        // عشان الاسم ما يطلع برا المستطيل
+        const maxWidth = canvas.width * 0.55;
 
-        const fontSize = fitFont(name, MAX_WIDTH);
+        const fontSize = fitFont(name, maxWidth);
 
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -208,11 +222,11 @@
         ctx.fillStyle = NAME_COLOR;
         ctx.font = `800 ${fontSize}px "GE SS Two"`;
 
-        ctx.shadowColor = "rgba(0,0,0,.15)";
-        ctx.shadowBlur = 4;
+        ctx.shadowColor = "rgba(0,0,0,.12)";
+        ctx.shadowBlur = 3;
         ctx.shadowOffsetY = 2;
 
-        ctx.fillText(name, CENTER_X, CENTER_Y);
+        ctx.fillText(name, x, y);
 
         lastUrl = canvas.toDataURL("image/png");
         dlBtn.disabled = false;
@@ -236,4 +250,3 @@
   </script>
 </body>
 </html>
-
