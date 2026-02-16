@@ -107,16 +107,19 @@
     .ghost{ background:#f1e7e9; color:var(--burgundy); }
     .ghost:disabled{ opacity:.55; cursor:not-allowed; }
 
-    /* عرض الكانفس: لا يكون ضخم وقت العرض */
+    /* ✅ هنا أهم شيء: لا نخلي CSS يفرض عرض/طول غير متساوي */
+    .preview{
+      margin-top:14px;
+      display:flex;
+      justify-content:center;
+    }
+
     canvas{
-      width:100%;
-      height:auto;
-      max-height:72vh;           /* ✅ يخلي المعاينة بدون سكرول مبالغ */
       display:block;
       border-radius:16px;
       border:1px solid var(--border);
-      margin-top:14px;
       background:#fff;
+      /* لا نكتب width/height هنا إطلاقًا */
     }
   </style>
 </head>
@@ -140,35 +143,42 @@
         <button class="ghost" id="dl" disabled>تحميل</button>
       </div>
 
-      <canvas id="c"></canvas>
+      <div class="preview">
+        <canvas id="c"></canvas>
+      </div>
+
     </div>
   </div>
 
   <script>
     // ===== إعدادات الاسم =====
     const NAME_COLOR = "#7daab3";
-    const BASE_FONT_SIZE = 150;     // (لا تغيّرها إذا عاجبك حجم الخط)
+    const BASE_FONT_SIZE = 150; // خليها مثل ما هي (زي اللي قلتي ممتاز)
     const MIN_FONT_SIZE  = 70;
 
-    // ===== مكان "المستطيل" على template.png (بناءً على تصميمك 1152x2048) =====
-    // نستخدم نسب عشان لو تغيرت الدقة يظل مضبوط.
+    // ===== مكان "المستطيل" على template.png (تصميم 1152×2048) =====
+    // ✅ هذا المستطيل الأبيض اللي تحت
     const RECT = {
-      x1r: 0.1805555556,  // 208 / 1152
-      x2r: 0.7083333333,  // 816 / 1152
-      y1r: 0.7412109375,  // 1518 / 2048
-      y2r: 0.8110351563   // 1661 / 2048
+      x1r: 208/1152,   // بداية المستطيل X
+      x2r: 816/1152,   // نهاية المستطيل X
+      y1r: 1518/2048,  // بداية المستطيل Y
+      y2r: 1661/2048   // نهاية المستطيل Y
     };
 
-    // ===== إزاحات بسيطة (طلبك: يسار تِكة + ينزل تِكة داخل المستطيل) =====
-    const OFFSET_X = -18;   // ⬅️ يسار شوي
-    const OFFSET_Y = +6;    // ⬇️ نزله شوي (داخل المستطيل)
+    // ✅ طلبك: ارفعه تكة + يسار تكة (داخل المستطيل)
+    const OFFSET_X = -28;  // يسار شوي
+    const OFFSET_Y = -6;   // فوق شوي (عشان ما يطلع فوق المستطيل)
 
-    const canvas   = document.getElementById("c");
-    const ctx      = canvas.getContext("2d");
-    const nameInput= document.getElementById("name");
-    const genBtn   = document.getElementById("gen");
-    const dlBtn    = document.getElementById("dl");
-    let lastUrl    = null;
+    // ✅ تصغير للعرض فقط بدون Stretch
+    const PREVIEW_MAX_VH = 70; // أقصى ارتفاع للعرض = 70% من الشاشة
+
+    const canvas    = document.getElementById("c");
+    const ctx       = canvas.getContext("2d");
+    const nameInput = document.getElementById("name");
+    const genBtn    = document.getElementById("gen");
+    const dlBtn     = document.getElementById("dl");
+
+    let lastUrl = null;
 
     function fitFontToRect(text, maxW, maxH){
       let size = BASE_FONT_SIZE;
@@ -180,6 +190,17 @@
         size -= 2;
       }
       return MIN_FONT_SIZE;
+    }
+
+    function setPreviewScale(){
+      const parentW = canvas.parentElement.clientWidth;
+      const maxH = window.innerHeight * (PREVIEW_MAX_VH/100);
+
+      const scale = Math.min(parentW / canvas.width, maxH / canvas.height, 1);
+
+      // ✅ نفس النسبة للعرض والطول = مافي Stretch
+      canvas.style.width  = Math.round(canvas.width  * scale) + "px";
+      canvas.style.height = Math.round(canvas.height * scale) + "px";
     }
 
     async function generate(){
@@ -196,13 +217,14 @@
       img.src = "template.png";
 
       img.onload = () => {
+        // ✅ يرسم بنفس دقة الصورة الأصلية (بدون أي تغيير)
         canvas.width  = img.naturalWidth;
         canvas.height = img.naturalHeight;
 
         ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.drawImage(img,0,0);
 
-        // احسب المستطيل الحقيقي
+        // احسب المستطيل الحقيقي بالبكسل
         const rx1 = canvas.width  * RECT.x1r;
         const rx2 = canvas.width  * RECT.x2r;
         const ry1 = canvas.height * RECT.y1r;
@@ -211,21 +233,22 @@
         const rw = rx2 - rx1;
         const rh = ry2 - ry1;
 
-        // نقطة الكتابة: منتصف المستطيل + إزاحات بسيطة
+        // نقطة النص: منتصف المستطيل + الإزاحات
         const x = rx1 + (rw/2) + OFFSET_X;
         const y = ry1 + (rh/2) + OFFSET_Y;
 
-        // حدود آمنة داخل المستطيل (عشان ما يلمس الحواف)
-        const pad = Math.max(18, rw * 0.04);
-        const maxW = rw - (pad * 2);
-        const maxH = rh - (pad * 1.6);
+        // حدود آمنة داخل المستطيل
+        const padX = Math.max(22, rw * 0.05);
+        const padY = Math.max(14, rh * 0.18);
+        const maxW = rw - (padX * 2);
+        const maxH = rh - (padY * 2);
 
         const fontSize = fitFontToRect(name, maxW, maxH);
 
-        // ✅ قص داخل المستطيل: مهما كان الاسم ما يطلع برا
+        // ✅ Clip داخل المستطيل: الاسم مستحيل يطلع برا مهما كان
         ctx.save();
         ctx.beginPath();
-        ctx.rect(rx1 + pad, ry1 + pad/2, rw - (pad*2), rh - pad);
+        ctx.rect(rx1 + padX, ry1 + padY, rw - (padX*2), rh - (padY*2));
         ctx.clip();
 
         ctx.direction = "rtl";
@@ -234,8 +257,8 @@
         ctx.fillStyle = NAME_COLOR;
         ctx.font = `500 ${fontSize}px "GE SS Two", Arial`;
 
-        ctx.shadowColor = "rgba(0,0,0,0.12)";
-        ctx.shadowBlur = 3;
+        ctx.shadowColor = "rgba(0,0,0,0.10)";
+        ctx.shadowBlur = 2;
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 2;
 
@@ -244,9 +267,12 @@
 
         lastUrl = canvas.toDataURL("image/png");
         dlBtn.disabled = false;
+
+        // ✅ صغّر العرض فقط (بدون Stretch)
+        setPreviewScale();
       };
 
-      img.onerror = () => alert("تأكدي من وجود template.png في نفس مجلد GitHub وبنفس الاسم.");
+      img.onerror = () => alert("تأكدي من وجود template.png في نفس المجلد وبنفس الاسم.");
     }
 
     function download(){
@@ -263,10 +289,14 @@
     genBtn.addEventListener("click", generate);
     dlBtn.addEventListener("click", download);
     nameInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") generate(); });
+
+    // لو تغير حجم الشاشة، نعيد ضبط المعاينة
+    window.addEventListener("resize", () => {
+      if (canvas.width && canvas.height) setPreviewScale();
+    });
   </script>
 </body>
 </html>
-
 
 
 
