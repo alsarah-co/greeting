@@ -8,7 +8,7 @@
 <style>
 body{
   margin:0;
-  font-family:"GE SS Two", Arial, system-ui;
+  font-family:"GE SS Two Medium", Arial, sans-serif;
   background:#f4f4f4;
 }
 
@@ -28,20 +28,18 @@ body{
 .row{
   display:flex;
   gap:10px;
-  align-items:end;
+  align-items:flex-start;
   flex-wrap:wrap;
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
 }
 
 label{
   font-weight:bold;
   margin-bottom:6px;
-  display:block;
-}
-
-.note{
-  font-size:13px;
-  color:#777;
-  margin-top:6px;
 }
 
 input{
@@ -50,6 +48,12 @@ input{
   border:1px solid #ddd;
   min-width:320px;
   font-size:16px;
+}
+
+.note{
+  font-size:13px;
+  color:#777;
+  margin-top:6px;
 }
 
 button{
@@ -72,11 +76,21 @@ button{
 
 canvas{
   width:100%;
-  height:auto;
+  max-height:700px; /* عرض فقط بدون ستريتش */
+  object-fit:contain;
   margin-top:20px;
   border-radius:16px;
 }
 </style>
+
+<!-- تحميل الخط -->
+<style>
+@font-face {
+  font-family: "GE SS Two Medium";
+  src: url("GE_SS_Two_Medium.otf") format("opentype");
+}
+</style>
+
 </head>
 
 <body>
@@ -84,12 +98,10 @@ canvas{
   <div class="card">
 
     <div class="row">
-      <div>
+      <div class="field">
         <label>اسم الموظف</label>
         <input id="name" placeholder="اكتب الاسم هنا" />
-        <div class="note">
-          ملاحظة: يفضل استخدام الاسم الثنائي ليظهر التصميم بشكل أجمل.
-        </div>
+        <div class="note">يفضل استخدام الاسم الثنائي ليظهر التصميم بشكل أجمل.</div>
       </div>
 
       <button class="primary" id="gen">إنشاء البطاقة</button>
@@ -103,8 +115,8 @@ canvas{
 
 <script>
 const NAME_COLOR = "#7daab3";
-const BASE_FONT_SIZE = 200;
-const MIN_FONT_SIZE = 70;
+const BASE_FONT_SIZE = 190;
+const MIN_FONT_SIZE = 65;
 
 const canvas = document.getElementById("c");
 const ctx = canvas.getContext("2d");
@@ -117,7 +129,7 @@ let lastUrl = null;
 function fitFont(text, maxWidth){
   let size = BASE_FONT_SIZE;
   while(size > MIN_FONT_SIZE){
-    ctx.font = `800 ${size}px "GE SS Two"`;
+    ctx.font = `800 ${size}px "GE SS Two Medium"`;
     if(ctx.measureText(text).width <= maxWidth) return size;
     size -= 2;
   }
@@ -133,34 +145,32 @@ function generate(){
 
   img.onload = () => {
 
+    // لا نغير أبعاد الصورة نهائياً (جودة كاملة)
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
 
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img,0,0);
 
-    /* 🔥 إحداثيات دقيقة للمستطيل */
-    const rectWidth  = canvas.width * 0.54;
-    const rectHeight = canvas.height * 0.05;
+    // 🎯 أبعاد المستطيل بدقة
+    const rectWidth  = canvas.width * 0.62;
+    const rectHeight = canvas.height * 0.065;
 
-    const rectX = (canvas.width - rectWidth) / 2;
-    const rectY = canvas.height * 0.802;   // مكان المستطيل بالضبط
+    const rectX = (canvas.width - rectWidth) / 2 - 25; // يسار شوي
+    const rectY = canvas.height * 0.775;               // مضبوط بالملي
 
-    /* 🔥 تعديل بالملي */
-    const centerX = rectX + rectWidth / 2 - 18; // يسار شوي
-    const centerY = rectY + rectHeight / 2 - 6; // ارفع فوق شوي
+    const centerX = rectX + rectWidth / 2;
+    const centerY = rectY + rectHeight / 2;
 
-    const maxWidth = rectWidth * 0.9;
-
-    const fontSize = fitFont(name, maxWidth);
+    const fontSize = fitFont(name, rectWidth * 0.9);
 
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.direction = "rtl";
     ctx.fillStyle = NAME_COLOR;
-    ctx.font = `800 ${fontSize}px "GE SS Two"`;
+    ctx.font = `800 ${fontSize}px "GE SS Two Medium"`;
 
-    ctx.shadowColor = "rgba(0,0,0,.12)";
+    ctx.shadowColor = "rgba(0,0,0,.15)";
     ctx.shadowBlur = 3;
     ctx.shadowOffsetY = 2;
 
@@ -182,5 +192,6 @@ function download(){
 genBtn.onclick = generate;
 dlBtn.onclick = download;
 </script>
+
 </body>
 </html>
