@@ -99,6 +99,31 @@ button{
   color:#666;
 }
 
+/* ✅ اختيار اللون (إضافة فقط) */
+.color-picker{
+  margin-top:10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.color-picker span{
+  font-size:13px;
+  color:#666;
+  font-weight:bold;
+}
+.color-btn{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:2px solid #ddd;
+  cursor:pointer;
+  padding:0;
+}
+.color-btn.active{
+  outline:3px solid rgba(107,15,26,.25);
+  border-color:#6b0f1a;
+}
+
 canvas{
   width:100%;
   height:auto;
@@ -122,6 +147,15 @@ canvas{
       <div class="field">
         <label>اسم الموظف</label>
         <input id="name" placeholder="اكتب الاسم هنا" />
+
+        <!-- ✅ اختيار اللون (إضافة فقط) -->
+        <div class="color-picker">
+          <span>لون الاسم:</span>
+          <button type="button" class="color-btn active" data-color="#7daab3" style="background:#7daab3;" aria-label="أزرق"></button>
+          <button type="button" class="color-btn" data-color="#000000" style="background:#000000;" aria-label="أسود"></button>
+          <button type="button" class="color-btn" data-color="#c8a75e" style="background:#c8a75e;" aria-label="ذهبي"></button>
+        </div>
+
         <div class="note">ملاحظة: لإظهار التصميم بشكل أجمل يُفضّل استخدام الاسم الثنائي.</div>
       </div>
 
@@ -135,7 +169,9 @@ canvas{
 </div>
 
 <script>
-const NAME_COLOR = "#7daab3";
+/* ✅ تغيير بسيط: صار let عشان يتغير حسب الاختيار */
+let NAME_COLOR = "#7daab3";
+
 const BASE_FONT_SIZE = 130;   // حجم مضبوط
 const MIN_FONT_SIZE = 80;
 
@@ -174,8 +210,8 @@ function generate(){
     ctx.drawImage(img,0,0);
 
     // 🎯 المكان الدقيق داخل المستطيل
-const X = (canvas.width / 2) - 100; // يسار
-const Y = canvas.height * 0.797; // فوق تحت
+    const X = (canvas.width / 2) - 100; // يسار
+    const Y = canvas.height * 0.797;    // فوق تحت
 
     const MAX_WIDTH = canvas.width * 0.60;
 
@@ -208,6 +244,16 @@ function download(){
 
 genBtn.onclick = generate;
 dlBtn.onclick = download;
+
+/* ✅ إضافة فقط: تغيير اللون عند الضغط + تحديد الزر النشط */
+document.querySelectorAll(".color-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    NAME_COLOR = btn.dataset.color;
+
+    document.querySelectorAll(".color-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+  });
+});
 </script>
 </body>
 </html>
