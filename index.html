@@ -1,262 +1,184 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>بطاقة تهنئة</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>بطاقة تهنئة</title>
 
-  <style>
-    @font-face{
-      font-family: "GE SS Two";
-      src: url("./GE-SS-Two-Bold.otf") format("opentype");
-      font-weight: 800;
-      font-style: normal;
-    }
+<style>
+@font-face {
+  font-family: 'GE_SS_Two_Bold';
+  src: url('GE-SS-Two-Bold.otf') format('opentype');
+}
 
-    :root{
-      --burgundy:#6b0f1a;
-      --bg:#f4f4f4;
-      --border:#eadfe1;
-    }
+body{
+  margin:0;
+  font-family:'GE_SS_Two_Bold', Arial, sans-serif;
+  background:#f4f4f4;
+}
 
-    body{
-      margin:0;
-      font-family:"GE SS Two", Arial, "Segoe UI", system-ui;
-      background: var(--bg);
-    }
+.wrap{
+  max-width:900px;
+  margin:30px auto;
+  padding:15px;
+}
 
-    .wrap{
-      max-width: 980px;
-      margin: 26px auto;
-      padding: 14px;
-    }
+.card{
+  background:#fff;
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
 
-    .card{
-      background:#fff;
-      padding:18px;
-      border-radius:18px;
-      box-shadow:0 10px 30px rgba(0,0,0,.08);
-    }
+.row{
+  display:flex;
+  gap:10px;
+  align-items:end;
+  flex-wrap:wrap;
+}
 
-    .top{
-      display:flex;
-      justify-content:flex-start;
-      align-items:center;
-      margin-bottom: 10px;
-    }
+label{
+  font-weight:bold;
+  margin-bottom:6px;
+  display:block;
+}
 
-    .logo{
-      width:46px;
-      height:46px;
-      object-fit:contain;
-      border-radius:10px;
-    }
+input{
+  padding:12px 14px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  min-width:320px;
+  font-size:16px;
+}
 
-    .row{
-      display:flex;
-      gap:10px;
-      align-items:flex-end;
-      flex-wrap:wrap;
-      justify-content:flex-start;
-      margin-bottom: 10px;
-    }
+button{
+  padding:12px 18px;
+  border-radius:10px;
+  border:0;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    label{
-      display:block;
-      font-weight:800;
-      margin-bottom:6px;
-      font-size:14px;
-    }
+.primary{
+  background:#6b0f1a;
+  color:#fff;
+}
 
-    input{
-      padding:12px 14px;
-      border-radius:12px;
-      border:1px solid #ddd;
-      min-width:340px;
-      font-size:16px;
-      outline:none;
-      font-family:"GE SS Two", Arial, sans-serif;
-    }
+.ghost{
+  background:#eee;
+  color:#6b0f1a;
+}
 
-    input:focus{
-      border-color: rgba(107,15,26,.45);
-      box-shadow: 0 0 0 4px rgba(107,15,26,.10);
-    }
+.note{
+  font-size:13px;
+  color:#777;
+  margin-top:6px;
+}
 
-    .note{
-      font-size:12px;
-      color:#666;
-      margin-top:6px;
-      line-height:1.5;
-    }
-
-    button{
-      padding:12px 16px;
-      border-radius:12px;
-      border:0;
-      cursor:pointer;
-      font-weight:800;
-      font-size:14px;
-      font-family:"GE SS Two", Arial, sans-serif;
-    }
-
-    .primary{ background:var(--burgundy); color:#fff; }
-    .primary:hover{ filter: brightness(.95); }
-
-    .ghost{ background:#eee; color:var(--burgundy); }
-    .ghost:disabled{ opacity:.55; cursor:not-allowed; }
-
-    .preview{
-      width:100%;
-      display:flex;
-      justify-content:center;
-    }
-
-    canvas{
-      width: 100%;
-      max-width: 900px;
-      height: auto;
-      display:block;
-      border-radius:16px;
-      background:#fff;
-    }
-  </style>
+canvas{
+  width:100%;
+  height:auto;
+  margin-top:20px;
+  border-radius:16px;
+}
+</style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="card">
+<div class="wrap">
+  <div class="card">
 
-      <div class="top">
-        <img class="logo" src="logo.png" alt="logo">
+    <div class="row">
+      <div>
+        <label>اسم الموظف</label>
+        <input id="name" placeholder="اكتب الاسم هنا" />
+        <div class="note">يفضل استخدام الاسم الثنائي ليظهر التصميم بشكل أجمل.</div>
       </div>
 
-      <div class="row">
-        <div>
-          <label for="name">اسم الموظف</label>
-          <input id="name" type="text" placeholder="اكتب الاسم هنا" />
-          <div class="note">ملاحظة: لإظهار التصميم بشكل أجمل يفضّل استخدام الاسم الثنائي.</div>
-        </div>
-
-        <button class="primary" id="gen">إنشاء البطاقة</button>
-        <button class="ghost" id="dl" disabled>تحميل</button>
-      </div>
-
-      <div class="preview">
-        <canvas id="c"></canvas>
-      </div>
-
+      <button class="primary" id="gen">إنشاء البطاقة</button>
+      <button class="ghost" id="dl" disabled>تحميل</button>
     </div>
+
+    <canvas id="c"></canvas>
+
   </div>
+</div>
 
-  <script>
-    // ===== ألوان وحجم خط الاسم =====
-    const NAME_COLOR     = "#7daab3";
-    const BASE_FONT_SIZE = 160;
-    const MIN_FONT_SIZE  = 70;
+<script>
+const NAME_COLOR = "#7daab3";
+const BASE_FONT_SIZE = 170;   // حجم مضبوط
+const MIN_FONT_SIZE = 80;
 
-    // ===== مكان المستطيل (بالنِّسب من أبعاد الصورة) =====
-    // إذا تبغين “تكة يسار/يمين/فوق/تحت” عدّلي OFFSETS فقط
-    const BOX_X_RATIO = 0.11;  // بداية المستطيل من اليسار
-    const BOX_W_RATIO = 0.70;  // عرض المستطيل
-    const BOX_Y_RATIO = 0.718; // بداية المستطيل من فوق
-    const BOX_H_RATIO = 0.042; // ارتفاع المستطيل
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+const nameInput = document.getElementById("name");
+const genBtn = document.getElementById("gen");
+const dlBtn = document.getElementById("dl");
 
-    // ===== تكايات بسيطة (هذا اللي كنتي تبغينه “بالملي”) =====
-    const OFFSET_X = -18;  // يسار شوي (زيدي سالب = يسار أكثر)
-    const OFFSET_Y = 22;   // فوق شوي (زيدي موجب = ينزل)
+let lastUrl = null;
 
-    const canvas    = document.getElementById("c");
-    const ctx       = canvas.getContext("2d");
-    const nameInput = document.getElementById("name");
-    const genBtn    = document.getElementById("gen");
-    const dlBtn     = document.getElementById("dl");
+function fitFont(text, maxWidth){
+  let size = BASE_FONT_SIZE;
+  while(size > MIN_FONT_SIZE){
+    ctx.font = `800 ${size}px GE_SS_Two_Bold`;
+    if(ctx.measureText(text).width <= maxWidth) return size;
+    size -= 2;
+  }
+  return MIN_FONT_SIZE;
+}
 
-    let lastUrl = null;
+function generate(){
+  const name = nameInput.value.trim();
+  if(!name) return alert("اكتب الاسم");
 
-    function fitFont(text, maxWidth){
-      let size = BASE_FONT_SIZE;
-      while(size > MIN_FONT_SIZE){
-        ctx.font = `800 ${size}px "GE SS Two"`;
-        if(ctx.measureText(text).width <= maxWidth) return size;
-        size -= 2;
-      }
-      return MIN_FONT_SIZE;
-    }
+  const img = new Image();
+  img.src = "template.png";
 
-    async function generate(){
-      const name = nameInput.value.trim();
-      if(!name) return alert("اكتب الاسم");
+  img.onload = () => {
 
-      const img = new Image();
-      img.src = "template.png";
+    // مهم جداً عشان ما يصير سترتش
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
 
-      img.onload = async () => {
-        // ✅ جودة كاملة بدون Stretch
-        canvas.width  = img.naturalWidth;
-        canvas.height = img.naturalHeight;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0);
 
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.drawImage(img,0,0);
+    // 🎯 المكان الدقيق داخل المستطيل
+    const X = (canvas.width / 2) - 35;   // تحريك يسار خفيف
+    const Y = canvas.height * 0.77;      // مكان المستطيل بالضبط
 
-        // تأكد الخط جاهز
-        await document.fonts.load('800 120px "GE SS Two"');
+    const MAX_WIDTH = canvas.width * 0.60;
 
-        // حساب المستطيل الحقيقي على الكانفس
-        const boxX = canvas.width  * BOX_X_RATIO;
-        const boxY = canvas.height * BOX_Y_RATIO;
-        const boxW = canvas.width  * BOX_W_RATIO;
-        const boxH = canvas.height * BOX_H_RATIO;
+    const fontSize = fitFont(name, MAX_WIDTH);
 
-        // مركز الكتابة داخل المستطيل
-        const x = (boxX + boxW/2) + OFFSET_X;
-        const y = (boxY + boxH/2) + OFFSET_Y;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.direction = "rtl";
+    ctx.fillStyle = NAME_COLOR;
+    ctx.font = `800 ${fontSize}px GE_SS_Two_Bold`;
 
-        // الاسم ما يطلع برا: نستخدم قصّ (clip) داخل المستطيل
-        const maxWidth = boxW * 0.92;
-        const fontSize = fitFont(name, maxWidth);
+    ctx.shadowColor = "rgba(0,0,0,.15)";
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetY = 2;
 
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(boxX, boxY, boxW, boxH);
-        ctx.clip();
+    ctx.fillText(name, X, Y);
 
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.direction = "rtl";
-        ctx.fillStyle = NAME_COLOR;
-        ctx.font = `800 ${fontSize}px "GE SS Two"`;
+    lastUrl = canvas.toDataURL("image/png");
+    dlBtn.disabled = false;
+  };
+}
 
-        // ظل خفيف
-        ctx.shadowColor = "rgba(0,0,0,.12)";
-        ctx.shadowBlur = 3;
-        ctx.shadowOffsetY = 2;
+function download(){
+  if(!lastUrl) return;
+  const a = document.createElement("a");
+  a.href = lastUrl;
+  a.download = "بطاقة.png";
+  a.click();
+}
 
-        ctx.fillText(name, x, y);
-        ctx.restore();
-
-        lastUrl = canvas.toDataURL("image/png");
-        dlBtn.disabled = false;
-      };
-
-      img.onerror = () => alert("template.png غير موجود أو اسمه مختلف.");
-    }
-
-    function download(){
-      if(!lastUrl) return;
-      const safe = (nameInput.value || "card").trim().replace(/\s+/g, "_");
-      const a = document.createElement("a");
-      a.href = lastUrl;
-      a.download = `بطاقة_${safe}.png`;
-      a.click();
-    }
-
-    genBtn.addEventListener("click", generate);
-    dlBtn.addEventListener("click", download);
-    nameInput.addEventListener("keydown", (e) => { if(e.key === "Enter") generate(); });
-  </script>
+genBtn.onclick = generate;
+dlBtn.onclick = download;
+</script>
 </body>
 </html>
-
-
 
