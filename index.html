@@ -106,7 +106,7 @@ canvas{
 
 <script>
 const NAME_COLOR = "#7daab3";
-const BASE_FONT_SIZE = 170;   // حجم مضبوط
+const BASE_FONT_SIZE = 140;   // حجم مضبوط
 const MIN_FONT_SIZE = 80;
 
 const canvas = document.getElementById("c");
@@ -144,8 +144,8 @@ function generate(){
     ctx.drawImage(img,0,0);
 
     // 🎯 المكان الدقيق داخل المستطيل
-const X = (canvas.width / 2) - 40;
-const Y = canvas.height * 0.772; 
+const X = (canvas.width / 2) - 50;
+const Y = canvas.height * 0.78; 
 
     const MAX_WIDTH = canvas.width * 0.60;
 
@@ -181,5 +181,6 @@ dlBtn.onclick = download;
 </script>
 </body>
 </html>
+
 
 
