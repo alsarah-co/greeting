@@ -30,10 +30,10 @@ body{
   box-shadow:0 10px 30px rgba(0,0,0,.08);
 }
 
-/* ✅ اللوقو */
+/* اللوقو */
 .top{
   display:flex;
-  justify-content:flex-end; /* يمين */
+  justify-content:flex-end;
   margin-bottom:12px;
 }
 .logo{
@@ -42,16 +42,16 @@ body{
   object-fit:contain;
 }
 
-/* ✅ صف الحقل + الأزرار */
+/* صف الحقل + الأزرار */
 .row{
   display:flex;
   gap:12px;
-  align-items:flex-end;     /* نفس مستوى الزر */
-  flex-wrap:wrap;           /* في الشاشات الصغيرة ينزلون */
+  align-items:flex-end;
+  flex-wrap:wrap;
 }
 
 .field{
-  flex: 1 1 420px;          /* يتمدد بس ما يأكل الأزرار */
+  flex: 1 1 420px;
   min-width:260px;
 }
 
@@ -61,7 +61,6 @@ label{
   display:block;
 }
 
-/* ✅ شلنا min-width اللي كان يسبب دخول الحقل على الأزرار */
 input{
   width:100%;
   padding:12px 14px;
@@ -71,7 +70,6 @@ input{
   box-sizing:border-box;
 }
 
-/* ✅ الأزرار ما تتمدد */
 button{
   padding:12px 18px;
   border-radius:10px;
@@ -92,25 +90,26 @@ button{
   color:#6b0f1a;
 }
 
-/* ✅ الملاحظة تحت الحقل وبس */
 .note{
   margin-top:8px;
   font-size:13px;
   color:#666;
 }
 
-/* ✅ اختيار اللون (إضافة فقط) */
+/* اختيار اللون */
 .color-picker{
   margin-top:10px;
   display:flex;
   align-items:center;
   gap:10px;
 }
+
 .color-picker span{
   font-size:13px;
   color:#666;
   font-weight:bold;
 }
+
 .color-btn{
   width:28px;
   height:28px;
@@ -119,6 +118,7 @@ button{
   cursor:pointer;
   padding:0;
 }
+
 .color-btn.active{
   outline:3px solid rgba(107,15,26,.25);
   border-color:#6b0f1a;
@@ -137,26 +137,44 @@ canvas{
 <div class="wrap">
   <div class="card">
 
-    <!-- ✅ اللوقو (واجهة فقط) -->
     <div class="top">
       <img src="logo.png" class="logo" alt="Logo">
     </div>
 
-    <!-- ✅ الحقل + الأزرار بنفس السطر -->
     <div class="row">
       <div class="field">
         <label>اسم الموظف</label>
         <input id="name" placeholder="اكتب الاسم هنا" />
 
-        <!-- ✅ اختيار اللون (إضافة فقط) -->
+        <!-- اختيار اللون -->
         <div class="color-picker">
           <span>لون الاسم:</span>
-          <button type="button" class="color-btn active" data-color="#7daab3" style="background:#7daab3;" aria-label="أزرق"></button>
-          <button type="button" class="color-btn" data-color="#000000" style="background:#000000;" aria-label="أسود"></button>
-          <button type="button" class="color-btn" data-color="#c8a75e" style="background:#c8a75e;" aria-label="ذهبي"></button>
+
+          <button type="button" class="color-btn active"
+            data-color="#7daab3"
+            style="background:#7daab3;">
+          </button>
+
+          <button type="button" class="color-btn"
+            data-color="#000000"
+            style="background:#000000;">
+          </button>
+
+          <button type="button" class="color-btn"
+            data-color="#c8a75e"
+            style="background:#c8a75e;">
+          </button>
+
+          <!-- اللون العودي الجديد -->
+          <button type="button" class="color-btn"
+            data-color="#56151F"
+            style="background:#56151F;">
+          </button>
         </div>
 
-        <div class="note">ملاحظة: لإظهار التصميم بشكل أجمل يُفضّل استخدام الاسم الثنائي.</div>
+        <div class="note">
+          ملاحظة: لإظهار التصميم بشكل أجمل يُفضّل استخدام الاسم الثنائي.
+        </div>
       </div>
 
       <button class="primary" id="gen">إنشاء البطاقة</button>
@@ -169,10 +187,9 @@ canvas{
 </div>
 
 <script>
-/* ✅ تغيير بسيط: صار let عشان يتغير حسب الاختيار */
 let NAME_COLOR = "#7daab3";
 
-const BASE_FONT_SIZE = 130;   // حجم مضبوط
+const BASE_FONT_SIZE = 130;
 const MIN_FONT_SIZE = 80;
 
 const canvas = document.getElementById("c");
@@ -202,16 +219,14 @@ function generate(){
 
   img.onload = () => {
 
-    // مهم جداً عشان ما يصير سترتش
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
 
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img,0,0);
 
-    // 🎯 المكان الدقيق داخل المستطيل
-    const X = (canvas.width / 2) - 100; // يسار
-    const Y = canvas.height * 0.797;    // فوق تحت
+    const X = (canvas.width / 2) - 100;
+    const Y = canvas.height * 0.797;
 
     const MAX_WIDTH = canvas.width * 0.60;
 
@@ -245,7 +260,6 @@ function download(){
 genBtn.onclick = generate;
 dlBtn.onclick = download;
 
-/* ✅ إضافة فقط: تغيير اللون عند الضغط + تحديد الزر النشط */
 document.querySelectorAll(".color-btn").forEach(btn=>{
   btn.addEventListener("click", ()=>{
     NAME_COLOR = btn.dataset.color;
@@ -257,9 +271,6 @@ document.querySelectorAll(".color-btn").forEach(btn=>{
 </script>
 </body>
 </html>
-
-
-
 
 
 
